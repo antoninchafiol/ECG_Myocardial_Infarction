@@ -16,3 +16,17 @@ The goals for this project is to:
 - Rightly  manipulate data
 - Find a good model that fit the datatype
 - Approach the 89% as much as possible
+
+## Data & Context
+
+To better understand how to classify the data, I need to learn to do it myself, prior to make a NN learn it.
+This way, here's a list of sources/links I've found/used to help me:
+- https://www.osmosis.org/learn/ECG_cardiac_infarction_and_ischemia
+- https://www.mayoclinic.org/diseases-conditions/myocardial-ischemia/symptoms-causes/syc-20375417
+- https://jamanetwork.com/journals/jamainternalmedicine/article-abstract/600227
+- https://geekymedics.com/how-to-read-an-ecg/
+- https://oxfordmedicaleducation.com/ecgs/ecg-interpretation/
+- https://en.wikipedia.org/wiki/Myocardial_infarction
+
+Wih a better understanding of the need, I'll change my dataset and/or rounding if necesserary to bett
+
