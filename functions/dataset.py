@@ -6,7 +6,11 @@ class CustomDTS(Dataset):
         X = []
         Y = []
         for line in open(file,'r').readlines():
-            Y.append([float(i) for i in line.split()][0])
+            tmp = ([float(i) for i in line.split()][0])
+            if temp==-1.0:
+                Y.append(0.0)
+            else:
+                Y.append(tmp)
             X.append([float(i) for i in line.split()][1:])
         X = np.array(X, dtype='float32')
         Y = np.array(Y, dtype='int8')

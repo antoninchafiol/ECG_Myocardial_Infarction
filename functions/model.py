@@ -89,8 +89,20 @@ def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler
     last_epoch_wts = copy.deepcopy(model.state_dict())
     return model, best_wts, last_epoch_wts, losses, accuracies
           
-def train(model, dataloaders, criterion, optimizer, metrics, scheduler=None, epoch=5, device, weights=None):
+def train(model, dataloader, criterion, optimizer, metrics, scheduler=None, epoch=5, device, weights=None):
+          dl_size = len(dataloader)
     # This function is to train only and quickly (from a specific state_dict or continuing with the current model state_dict)
+    if weights is not None:
+          model.load(weights)
+    
+    for e in range(epochs):
+        epoch_loss = 0.0
+        epoch_acc = 0
+        best_acc = 0
+        model.train()
+        progress = tqdm(enumerate(dataloader), desc="Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dl_size)
+        for Y, X from progress:
+          
     return model
     
     
