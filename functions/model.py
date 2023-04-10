@@ -90,20 +90,47 @@ def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler
     return model, best_wts, last_epoch_wts, losses, accuracies
           
 def train(model, dataloader, criterion, optimizer, metrics, scheduler=None, epoch=5, device, weights=None):
-          dl_size = len(dataloader)
+    dl_size = len(dataloader)
     # This function is to train only and quickly (from a specific state_dict or continuing with the current model state_dict)
     if weights is not None:
           model.load(weights)
-    
+          
+    losses = []
+    metrics = []
     for e in range(epochs):
         epoch_loss = 0.0
-        epoch_acc = 0
-        best_acc = 0
+        epoch_acc = 0.0
+        best_acc = 0.0
         model.train()
         progress = tqdm(enumerate(dataloader), desc="Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dl_size)
         for Y, X from progress:
+          running_acc = 0.0
+          running_loss = 0.0
           
-    return model
+          X = X.to(device)
+          Y = Y.to(device)
+          
+          optimizer.zero_grad()
+          
+          output= model(X)
+          _, Yhat = torch.max(output, 1)
+          
+          loss = criterion(output, Y)
+          loss.backward()
+          optimizer.step()
+          
+          running_loss += loss.item()
+          running_acc += metrics(Yhat, Y)
+        if scheduler is not None:
+          scheduler.step()
+        epoch_loss = running_loss / dl_size
+        epoch_acc = running_acc / dl_size
+        losses.append(epoch_loss)
+        metrics.append(epoch_acc)
+        print(f\"Epoch Loss: {epoch_loss}\")
+        print(f\"Epoch Accuracy: {epoch_acc}\")
+              
+    return model, losses, metrics
     
     
     
