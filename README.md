@@ -28,5 +28,19 @@ This way, here's a list of sources/links I've found/used to help me:
 - https://oxfordmedicaleducation.com/ecgs/ecg-interpretation/
 - https://en.wikipedia.org/wiki/Myocardial_infarction
 
-Wih a better understanding of the need, I'll change my dataset and/or rounding if necesserary to bett
+Wih a better understanding of the need, I'll change my dataset and/or rounding if necesserary to bettert understand the data
+
+## Model
+
+### Theory
+
+Due to my current limited knowledge in time series, the first model I'll use and which was advised to put in place is convolutionnal networks and to be more specific Residual Convolutionnal network (ResNet).
+
+I'll try multiple iterations of ResNet and even other convolutionnal based networks and put the best results of each ones in the Practice field.
+
+Wwhen finished with iterations of convolutionnal network, I'll search for papers for ECG specific classification.
+At this time, here's the papers I found and need to dig into:
+- https://www.nature.com/articles/s41598-021-97118-5
+- https://paperswithcode.com/task/ecg-classification
+- https://www.frontiersin.org/articles/10.3389/fphy.2019.00103/full
 

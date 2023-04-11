@@ -1,6 +1,8 @@
 import time
 import copy
-       
+import torch
+from torch.optim import *
+from tqdm import tqdm
         
 def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler=None, epochs=5):
     datasloader_sizes= {'train': len(train_dl), 'dev': len(dev_dl)}
