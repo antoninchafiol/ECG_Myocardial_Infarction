@@ -91,12 +91,13 @@ def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler
           
 def train(model, dataloader, criterion, optimizer, metrics, scheduler=None, epoch=5, device, weights=None):
     dl_size = len(dataloader)
+    start = time.time()
     # This function is to train only and quickly (from a specific state_dict or continuing with the current model state_dict)
     if weights is not None:
           model.load(weights)
           
     losses = []
-    metrics = []
+    accuracies = []
     for e in range(epochs):
         epoch_loss = 0.0
         epoch_acc = 0.0
@@ -121,18 +122,106 @@ def train(model, dataloader, criterion, optimizer, metrics, scheduler=None, epoc
           
           running_loss += loss.item()
           running_acc += metrics(Yhat, Y)
+          progress.set_description(f\"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}\")
         if scheduler is not None:
           scheduler.step()
         epoch_loss = running_loss / dl_size
         epoch_acc = running_acc / dl_size
         losses.append(epoch_loss)
-        metrics.append(epoch_acc)
-        print(f\"Epoch Loss: {epoch_loss}\")
-        print(f\"Epoch Accuracy: {epoch_acc}\")
-              
-    return model, losses, metrics
+        accuracies.append(epoch_acc)
+        print(f\"Training Epoch Loss: {epoch_loss}\")
+        print(f\"Training: Epoch Accuracy: {epoch_acc}\")
+        time_elapsed_s = np.round(time.time() - start,2) 
+        print(f\"Training completed in: {time_elapsed_s}\")   
+    return model, losses, accuracies
     
     
+def evaluation(model, metrics, device, weights=None):
+    dl_size = len(dataloader)
+    start = time.time()          
+    if weights is not None:
+          model.load(weights)
+          
+    losses = []
+    accuracies = []
+    for e in range(epochs):
+        epoch_loss = 0.0
+        epoch_acc = 0.0
+        best_acc = 0.0
+        model.eval()
+        progress = tqdm(enumerate(dataloader), desc="Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dl_size)
+        for Y, X from progress:
+          running_acc = 0.0
+          running_loss = 0.0
+          with torch.no_grad():
+              X = X.to(device)
+              Y = Y.to(device)
+
+              optimizer.zero_grad()
+
+              output= model(X)
+              _, Yhat = torch.max(output, 1)
+
+              loss = criterion(output, Y)
+              loss.backward()
+              optimizer.step()
+
+              running_loss += loss.item()
+              running_acc += metrics(Yhat, Y)
+              progress.set_description(f\"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}\")
+
+        epoch_loss = running_loss / dl_size
+        epoch_acc = running_acc / dl_size
+        losses.append(epoch_loss)
+        accuracies.append(epoch_acc)
+        print(f\"Evaluation Epoch Loss: {epoch_loss}\")
+        print(f\"Evaluation Epoch Accuracy: {epoch_acc}\")
+        time_elapsed_s = np.round(time.time() - start,2) 
+        print(f\"Evaluation completed in: {time_elapsed_s}\")      
+    return model, losses, accuracies
     
+def test(model, metrics, device, weights=None):
+    dl_size = len(dataloader)
+    start = time.time()          
+    if weights is not None:
+          model.load(weights)
+          
+    losses = []
+    accuracies = []
+    for e in range(epochs):
+        epoch_loss = 0.0
+        epoch_acc = 0.0
+        best_acc = 0.0
+        progress = tqdm(enumerate(dataloader), desc="Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dl_size)
+        for Y, X from progress:
+          running_acc = 0.0
+          running_loss = 0.0
+          with torch.no_grad():
+              X = X.to(device)
+              Y = Y.to(device)
+
+              optimizer.zero_grad()
+
+              output= model(X)
+              _, Yhat = torch.max(output, 1)
+
+              loss = criterion(output, Y)
+              loss.backward()
+              optimizer.step()
+
+              running_loss += loss.item()
+              running_acc += metrics(Yhat, Y)
+              progress.set_description(f\"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}\")
+
+        epoch_loss = running_loss / dl_size
+        epoch_acc = running_acc / dl_size
+        losses.append(epoch_loss)
+        accuracies.append(epoch_acc)
+        print(f\"Evaluation Epoch Loss: {epoch_loss}\")
+        print(f\"Evaluation Epoch Accuracy: {epoch_acc}\")
+        time_elapsed_s = np.round(time.time() - start,2) 
+        print(f\"Evaluation completed in: {time_elapsed_s}\")      
+    return model, losses, accuracies
+
     
     
