@@ -4,7 +4,7 @@ import torch
 from torch.optim import *
 from tqdm import tqdm
         
-def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler=None, epochs=5):
+def train_dev_model(model, dataloaders, criterion, optimizer, device, metrics, scheduler=None, epochs=5):
     dataloader_sizes= {'train': len(dataloaders['train']), 'dev': len(dataloaders['dev'])}
     start = time.time()
     
@@ -37,7 +37,7 @@ def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler
             progress = tqdm(enumerate(dataloaders[phase]), desc=f"Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dataloader_sizes[phase])
             for i, data in progress:
                 # Map the images and labels of the current batch 
-                Y = data[0].type(torch.LongTensor)
+                Y = data[0]
                 Y = Y.to(device)
                 X = data[1].to(device)
 
