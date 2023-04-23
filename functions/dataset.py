@@ -7,7 +7,7 @@ class CustomDTS(Dataset):
         Y = []
         for line in open(file,'r').readlines():
             tmp = ([float(i) for i in line.split()][0])
-            if temp==-1.0:
+            if tmp==-1.0:
                 Y.append(0.0)
             else:
                 Y.append(tmp)
@@ -20,4 +20,8 @@ class CustomDTS(Dataset):
     def __len__(self):
         return len(self.Y)
     def __getitem__(self, index):
-        return self.X[index],self.Y[index]
+        X = self.X[index]
+        Y = self.Y[index]
+        if self.transform is not None:
+            X = self.transform(X)
+        return X,Y

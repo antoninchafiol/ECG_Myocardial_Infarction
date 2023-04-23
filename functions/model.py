@@ -5,7 +5,7 @@ from torch.optim import *
 from tqdm import tqdm
         
 def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler=None, epochs=5):
-    datasloader_sizes= {'train': len(train_dl), 'dev': len(dev_dl)}
+    dataloader_sizes= {'train': len(dataloaders['train']), 'dev': len(dataloaders['dev'])}
     start = time.time()
     
     # Copy state dict to have the alternative of the best accuracy weights
@@ -16,7 +16,7 @@ def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler
     accuracies = []
     
     # Main loop
-    for e in range(epoch):
+    for e in range(epochs):
         # Declare loss and accuracy for the current epoch 
         epoch_loss = 0.0
         epoch_acc = 0
@@ -34,7 +34,7 @@ def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler
                 model.eval()
             
             # Phase Dataloader's Loop
-            progress = tqdm(enumerate(dataloaders[phase]), desc=f\"Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}\", total=datasloader_sizes[phase])
+            progress = tqdm(enumerate(dataloaders[phase]), desc=f"Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dataloader_sizes[phase])
             for i, data in progress:
                 # Map the images and labels of the current batch 
                 Y = data[0].type(torch.LongTensor)
@@ -69,7 +69,7 @@ def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler
                 r_acc = a
         
                 # Updater tqdm
-                progress.set_description(f\"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}\")
+                progress.set_description("Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}")
                 
         if phase == 'train' and scheduler!=None:
                     scheduler.step() 
@@ -78,20 +78,20 @@ def train_dev_model(model, dataloaders, criterion, optimizer, metrics, scheduler
         epoch_acc = running_acc / datasloader_sizes[phase]
         losses.append(epoch_loss)
         accuracies.append(epoch_acc)
-        print(f\"Epoch Loss: {epoch_loss}\")
-        print(f\"Epoch Accuracy: {epoch_acc}\")
+        print(f"Epoch Loss: {epoch_loss}")
+        print(f"Epoch Accuracy: {epoch_acc}")
         
         if epoch_acc > best_acc:
             best_wts_model = copy.deepcopy(model.state_dict())
     # Comopute time and displayo it
     time_elapsed_s = np.round(time.time() - start,2) 
-    print(f\"Training completed in: {time_elapsed_s}\")
+    print(f"Training completed in: {time_elapsed_s}")
     
     # Copy state dict to have the alternative of the last accuracy weights
     last_epoch_wts = copy.deepcopy(model.state_dict())
     return model, best_wts, last_epoch_wts, losses, accuracies
           
-def train(model, dataloader, criterion, optimizer, metrics, scheduler=None, epoch=5, device, weights=None):
+def train(model, dataloader, criterion, optimizer, metrics, device, scheduler=None, epoch=5, weights=None):
     dl_size = len(dataloader)
     start = time.time()
     # This function is to train only and quickly (from a specific state_dict or continuing with the current model state_dict)
@@ -99,43 +99,33 @@ def train(model, dataloader, criterion, optimizer, metrics, scheduler=None, epoc
           model.load(weights)
           
     losses = []
-    accuracies = []
     for e in range(epochs):
         epoch_loss = 0.0
-        epoch_acc = 0.0
-        best_acc = 0.0
         model.train()
-        progress = tqdm(enumerate(dataloader), desc="Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dl_size)
-        for Y, X from progress:
-          running_acc = 0.0
-          running_loss = 0.0
+        progress = tqdm(enumerate(dataloader), desc=f"Epoch: {e}, R_Loss: {running_loss}", total=dl_size)
+        for Y, X in progress:
+            X = X.to(device)
+            Y = Y.to(device)
           
-          X = X.to(device)
-          Y = Y.to(device)
+            optimizer.zero_grad()
+
+            output= model(X)
+            _, Yhat = torch.max(output, 1)
+
+            loss = criterion(output, Y)
+            loss.backward()
+            optimizer.step()
           
-          optimizer.zero_grad()
-          
-          output= model(X)
-          _, Yhat = torch.max(output, 1)
-          
-          loss = criterion(output, Y)
-          loss.backward()
-          optimizer.step()
-          
-          running_loss += loss.item()
-          running_acc += metrics(Yhat, Y)
-          progress.set_description(f\"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}\")
+            epoch_loss += loss.item()
+            progress.set_description(f"Epoch: {e+1}, R_Loss: {r_loss}")
         if scheduler is not None:
-          scheduler.step()
-        epoch_loss = running_loss / dl_size
-        epoch_acc = running_acc / dl_size
+            scheduler.step()
+        epoch_loss = epoch_loss / dl_size
         losses.append(epoch_loss)
-        accuracies.append(epoch_acc)
-        print(f\"Training Epoch Loss: {epoch_loss}\")
-        print(f\"Training: Epoch Accuracy: {epoch_acc}\")
+        print(f"Training Epoch Loss: {epoch_loss}")
         time_elapsed_s = np.round(time.time() - start,2) 
-        print(f\"Training completed in: {time_elapsed_s}\")   
-    return model, losses, accuracies
+        print(f"Training completed in: {time_elapsed_s}")   
+    return model, losses
     
     
 def evaluation(model, metrics, device, weights=None):
@@ -152,7 +142,7 @@ def evaluation(model, metrics, device, weights=None):
         best_acc = 0.0
         model.eval()
         progress = tqdm(enumerate(dataloader), desc="Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dl_size)
-        for Y, X from progress:
+        for Y, X in progress:
           running_acc = 0.0
           running_loss = 0.0
           with torch.no_grad():
@@ -170,16 +160,16 @@ def evaluation(model, metrics, device, weights=None):
 
               running_loss += loss.item()
               running_acc += metrics(Yhat, Y)
-              progress.set_description(f\"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}\")
+              progress.set_description(f"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}")
 
         epoch_loss = running_loss / dl_size
         epoch_acc = running_acc / dl_size
         losses.append(epoch_loss)
         accuracies.append(epoch_acc)
-        print(f\"Evaluation Epoch Loss: {epoch_loss}\")
-        print(f\"Evaluation Epoch Accuracy: {epoch_acc}\")
+        print(f"Evaluation Epoch Loss: {epoch_loss}")
+        print(f"Evaluation Epoch Accuracy: {epoch_acc}")
         time_elapsed_s = np.round(time.time() - start,2) 
-        print(f\"Evaluation completed in: {time_elapsed_s}\")      
+        print(f"Evaluation completed in: {time_elapsed_s}")      
     return model, losses, accuracies
     
 def test(model, metrics, device, weights=None):
@@ -195,7 +185,7 @@ def test(model, metrics, device, weights=None):
         epoch_acc = 0.0
         best_acc = 0.0
         progress = tqdm(enumerate(dataloader), desc="Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dl_size)
-        for Y, X from progress:
+        for Y, X in progress:
           running_acc = 0.0
           running_loss = 0.0
           with torch.no_grad():
@@ -213,16 +203,16 @@ def test(model, metrics, device, weights=None):
 
               running_loss += loss.item()
               running_acc += metrics(Yhat, Y)
-              progress.set_description(f\"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}\")
+              progress.set_description(f"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}")
 
         epoch_loss = running_loss / dl_size
         epoch_acc = running_acc / dl_size
         losses.append(epoch_loss)
         accuracies.append(epoch_acc)
-        print(f\"Evaluation Epoch Loss: {epoch_loss}\")
-        print(f\"Evaluation Epoch Accuracy: {epoch_acc}\")
+        print(f"Test Epoch Loss: {epoch_loss}")
+        print(f"Test Epoch Accuracy: {epoch_acc}")
         time_elapsed_s = np.round(time.time() - start,2) 
-        print(f\"Evaluation completed in: {time_elapsed_s}\")      
+        print(f"Test completed in: {time_elapsed_s}")      
     return model, losses, accuracies
 
     
