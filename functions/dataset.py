@@ -13,6 +13,7 @@ class CustomDTS(Dataset):
                 Y.append(tmp)
             X.append([float(i) for i in line.split()][1:])
         X = np.array(X, dtype='float32')
+        X = X.reshape((X.shape[0], X.shape[1],1,1))
         Y = np.array(Y, dtype='int8')
         self.X = X
         self.Y = Y

@@ -1,6 +1,7 @@
 import time
 import copy
 import torch
+import numpy as np
 from torch.optim import *
 from tqdm import tqdm
         
@@ -34,13 +35,13 @@ def train_dev_model(model, dataloaders, criterion, optimizer, device, metrics, s
                 model.eval()
             
             # Phase Dataloader's Loop
-            progress = tqdm(enumerate(dataloaders[phase]), desc=f"Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dataloader_sizes[phase])
-            for i, data in progress:
+            progress = tqdm(enumerate(dataloaders[phase]), desc=f"Epoch: {e}", total=dataloader_sizes[phase])
+            for i, (X,Y) in progress:
                 # Map the images and labels of the current batch 
-                Y = data[0]
+                X = X.to(device)
+                Y = Y.type(torch.LongTensor)
                 Y = Y.to(device)
-                X = data[1].to(device)
-
+                
                 # Put the optimizer's gradients to zero 
                 optimizer.zero_grad()
                 
@@ -62,20 +63,20 @@ def train_dev_model(model, dataloaders, criterion, optimizer, device, metrics, s
                         
                 # Compute Loss and accuracy
                 running_loss += loss.item()
-                a = accuracy_func(Yhat, Y)
+                a = metrics(Yhat, Y)
                 running_acc += a
  
                 r_loss =loss.item()
                 r_acc = a
         
                 # Updater tqdm
-                progress.set_description("Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}")
+                progress.set_description(f"Epoch: {e+1}")
                 
         if phase == 'train' and scheduler!=None:
                     scheduler.step() 
         # Compute epoch's Loss and accuracy
-        epoch_loss = running_loss / datasloader_sizes[phase]
-        epoch_acc = running_acc / datasloader_sizes[phase]
+        epoch_loss = running_loss / dataloader_sizes[phase]
+        epoch_acc = running_acc / dataloader_sizes[phase]
         losses.append(epoch_loss)
         accuracies.append(epoch_acc)
         print(f"Epoch Loss: {epoch_loss}")

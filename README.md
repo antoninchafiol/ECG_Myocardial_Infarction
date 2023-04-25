@@ -54,3 +54,12 @@ At this time, here's the papers I found and need to dig into:
 - https://www.nature.com/articles/s41598-021-97118-5
 - https://paperswithcode.com/task/ecg-classification
 - https://www.frontiersin.org/articles/10.3389/fphy.2019.00103/full
+
+### ResNet
+
+Since ResNet is mostly used for image classification it's algorithm require 2D Conv blocks which translate to (N,Cin,H,W) array in pytorch.
+The option to change the first layer to a 1D Conv Block can be helpful but need to rebuild the links to 2d Conv afterwards, In this case we should need to rebuild entire Resnet with 1D Conv blocks.
+I've chose to "expand" my arrays to the required 4D array required by Pytorch without changing the necessary informations.
+
+
+In Addition, I've read this paper which is a great reminder for how ResNet should work: https://arxiv.org/pdf/1611.06455.pdf

@@ -22,19 +22,19 @@ num_ftrs = model.fc.in_features
 model.fc= nn.Linear(in_features=num_ftrs, out_features=2, bias=False)
 model.to(device)
 
-batch_size = 256 
+batch_size = 10 
 
 data_train_dev = CustomDTS("datasets/ECG200_TRAIN.txt")
 mean = data_train_dev.__getitem__(5)[0].mean()
 std = data_train_dev.__getitem__(5)[0].std()
 
-# transform = transforms.Compose([
-#     transforms.ToTensor(), 
-#     transforms.Normalize(mean, std) 
-# ])
+transform = transforms.Compose([
+    transforms.ToTensor(), 
+    transforms.Normalize(mean, std) 
+])
 
-data_train_dev = CustomDTS("datasets/ECG200_TRAIN.txt")#, transform=transform)
-data_test = CustomDTS("datasets/ECG200_TEST.txt")#, transform=transform)
+data_train_dev = CustomDTS("datasets/ECG200_TRAIN.txt", transform=transform)
+data_test = CustomDTS("datasets/ECG200_TEST.txt", transform=transform)
 data_train, data_dev = torch.utils.data.random_split(data_train_dev, [0.7, 0.3], generator=torch.Generator().manual_seed(42))
 train_dl = DataLoader(data_train, batch_size=batch_size, shuffle=True)
 dev_dl = DataLoader(data_dev, batch_size=batch_size, shuffle=False)
