@@ -179,7 +179,6 @@ def test(model, dataloader, metrics, device, weights=None):
     if weights is not None:
           model.load(weights)
           
-    loss = 0.
     accuracy = 0.0
     
     progress = tqdm(enumerate(dataloader), total=dl_size)
@@ -191,19 +190,14 @@ def test(model, dataloader, metrics, device, weights=None):
             output= model(X)
             _, Yhat = torch.max(output, 1)
 
-            loss_ = criterion(output, Y)
-
-            loss += loss_.item()
             accuracy += metrics(Yhat, Y)
 
-    loss = running_loss / dl_size
-    accuracy = running_acc / dl_size
+    accuracy = accuracy / dl_size
     
-    print(f"Loss: {loss}")
     print(f"Accuracy: {accuracy}")
     time_elapsed_s = np.round(time.time() - start,2) 
     print(f"Test completed in: {time_elapsed_s}")      
-    return model, loss, accuracy
+    return model, accuracy
 
     
     

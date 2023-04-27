@@ -46,7 +46,7 @@ epochs = 500
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 metric = Accuracy(task="binary").to(device)
-scheduler = lr_scheduler.ConstantLR(optimizer, factor=0.9, total_iters=5)
+scheduler = lr_scheduler.ConstantLR(optimizer, factor=0.2, total_iters=5)
 
 model, best_wts, last_epoch_wts, losses, accuracies = train_dev_model(model, train_eval_dl, criterion, optimizer, device, metric, scheduler=scheduler, epochs=epochs)
 losses = torch.tensor(losses).cpu()
@@ -57,7 +57,8 @@ plt.plot([i for i in range(epochs)], losses, label='Loss')
 plt.show()
 plt.plot([i for i in range(epochs)], accuracies, label='Accuracy')
 plt.show()
-model, losses_test, accuracies_test = test(model, test_dl, metric) 
+
+model, accuracy_test = test(model, test_dl, metric, device) 
 
 
 torch.save(model.state_dict(), "weights/RunMain.pth")

@@ -60,6 +60,7 @@ At this time, here's the papers I found and need to dig into:
 Since ResNet is mostly used for image classification it's algorithm require 2D Conv blocks which translate to (N,Cin,H,W) array in pytorch.
 The option to change the first layer to a 1D Conv Block can be helpful but need to rebuild the links to 2d Conv afterwards, In this case we should need to rebuild entire Resnet with 1D Conv blocks.
 I've chose to "expand" my arrays to the required 4D array required by Pytorch without changing the necessary informations.
+I don't want to spend many time tuning a specific ResNet model for a good accuracy, If I've brokent biad / variance, I'll rather spend this time to study a better model best suited for time series and/or for ECG.
 
 In Addition, I've read this paper which is a great reminder for how ResNet should work: https://arxiv.org/pdf/1611.06455.pdf
 
@@ -71,10 +72,20 @@ Using the simple Accuracy metric
 #### No scheduler
 
 After running without any scheduler for 500 & 5000 Epochs for only train & dev, here's the dev accuracies registered:
+![Image](LossGraphRN_NoScheduler.png)
+![Image](AccuracyGraphRN_NoScheduler.png)
 
 The maximum found is around 80% Accuracy
 
 ##### With Scheduler
 
-I've chosen the ConstantLR Scheduler, after some tests (500 epochs each), the best value found for it is 0.9 and effective every 5 epochs.
-After all the tests done, this helped to increase global accuracy per 10% 
+I've chosen the ConstantLR Scheduler, after some quick tests (500 epochs each), the best value found for it is 0.2 and effective every 5 epochs.
+After all the tests done, this helped to increase global accuracy per 10%.
+This is the RSSched.pth in the weight folder.
+
+After full processing (train/dev/test), test accuracy is up to 84%.
+
+![Image](LossGraphRN_SchedON.png)
+![Image](AccGraphRN_SchedON.png)
+
+Still need to check for false positive/negative.
