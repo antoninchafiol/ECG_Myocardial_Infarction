@@ -173,48 +173,37 @@ def evaluation(model, metrics, device, weights=None):
         print(f"Evaluation completed in: {time_elapsed_s}")      
     return model, losses, accuracies
     
-def test(model, metrics, device, weights=None):
+def test(model, dataloader, metrics, device, weights=None):
     dl_size = len(dataloader)
     start = time.time()          
     if weights is not None:
           model.load(weights)
           
-    losses = []
-    accuracies = []
-    for e in range(epochs):
-        epoch_loss = 0.0
-        epoch_acc = 0.0
-        best_acc = 0.0
-        progress = tqdm(enumerate(dataloader), desc="Epoch: {e}, R_Loss: {running_loss}, R_Acc: {running_acc}", total=dl_size)
-        for Y, X in progress:
-          running_acc = 0.0
-          running_loss = 0.0
-          with torch.no_grad():
-              X = X.to(device)
-              Y = Y.to(device)
+    loss = 0.
+    accuracy = 0.0
+    
+    progress = tqdm(enumerate(dataloader), total=dl_size)
+    for i, (X,Y) in progress:
+        with torch.no_grad():
+            X = X.to(device)
+            Y = Y.to(device)
 
-              optimizer.zero_grad()
+            output= model(X)
+            _, Yhat = torch.max(output, 1)
 
-              output= model(X)
-              _, Yhat = torch.max(output, 1)
+            loss_ = criterion(output, Y)
 
-              loss = criterion(output, Y)
-              loss.backward()
-              optimizer.step()
+            loss += loss_.item()
+            accuracy += metrics(Yhat, Y)
 
-              running_loss += loss.item()
-              running_acc += metrics(Yhat, Y)
-              progress.set_description(f"Epoch: {e+1}, R_Loss: {r_loss}, R_Acc: {r_acc}")
-
-        epoch_loss = running_loss / dl_size
-        epoch_acc = running_acc / dl_size
-        losses.append(epoch_loss)
-        accuracies.append(epoch_acc)
-        print(f"Test Epoch Loss: {epoch_loss}")
-        print(f"Test Epoch Accuracy: {epoch_acc}")
-        time_elapsed_s = np.round(time.time() - start,2) 
-        print(f"Test completed in: {time_elapsed_s}")      
-    return model, losses, accuracies
+    loss = running_loss / dl_size
+    accuracy = running_acc / dl_size
+    
+    print(f"Loss: {loss}")
+    print(f"Accuracy: {accuracy}")
+    time_elapsed_s = np.round(time.time() - start,2) 
+    print(f"Test completed in: {time_elapsed_s}")      
+    return model, loss, accuracy
 
     
     

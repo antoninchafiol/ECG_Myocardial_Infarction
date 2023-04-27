@@ -6,6 +6,7 @@ from torchvision import transforms, datasets
 from torchvision.models import resnet50
 from torchmetrics import Accuracy
 from torch.utils.data import DataLoader
+import torch.optim.lr_scheduler as lr_scheduler
 
 import pandas as pd 
 import numpy as np
@@ -22,7 +23,7 @@ num_ftrs = model.fc.in_features
 model.fc= nn.Linear(in_features=num_ftrs, out_features=2, bias=False)
 model.to(device)
 
-batch_size = 10 
+batch_size = 50 
 
 data_train_dev = CustomDTS("datasets/ECG200_TRAIN.txt")
 mean = data_train_dev.__getitem__(5)[0].mean()
@@ -35,15 +36,28 @@ transform = transforms.Compose([
 
 data_train_dev = CustomDTS("datasets/ECG200_TRAIN.txt", transform=transform)
 data_test = CustomDTS("datasets/ECG200_TEST.txt", transform=transform)
-data_train, data_dev = torch.utils.data.random_split(data_train_dev, [0.7, 0.3], generator=torch.Generator().manual_seed(42))
+data_train, data_dev = torch.utils.data.random_split(data_train_dev, [0.6, 0.4], generator=torch.Generator().manual_seed(42))
 train_dl = DataLoader(data_train, batch_size=batch_size, shuffle=True)
 dev_dl = DataLoader(data_dev, batch_size=batch_size, shuffle=False)
 test_dl = DataLoader(data_test, batch_size=batch_size, shuffle=True)
 train_eval_dl = {'train': train_dl, 'dev': dev_dl}
 
-epochs = 10
+epochs = 500
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 metric = Accuracy(task="binary").to(device)
+scheduler = lr_scheduler.ConstantLR(optimizer, factor=0.9, total_iters=5)
 
-model, best_wts, last_epoch_wts, losses, accuracies = train_dev_model(model, train_eval_dl, criterion, optimizer, device, metric, scheduler=None, epochs=epochs)
+model, best_wts, last_epoch_wts, losses, accuracies = train_dev_model(model, train_eval_dl, criterion, optimizer, device, metric, scheduler=scheduler, epochs=epochs)
+losses = torch.tensor(losses).cpu()
+accuracies = torch.tensor(accuracies).cpu()
+print("Best Acc : " + str(torch.max(accuracies)))
+
+plt.plot([i for i in range(epochs)], losses, label='Loss')
+plt.show()
+plt.plot([i for i in range(epochs)], accuracies, label='Accuracy')
+plt.show()
+model, losses_test, accuracies_test = test(model, test_dl, metric) 
+
+
+torch.save(model.state_dict(), "weights/RunMain.pth")

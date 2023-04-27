@@ -61,5 +61,20 @@ Since ResNet is mostly used for image classification it's algorithm require 2D C
 The option to change the first layer to a 1D Conv Block can be helpful but need to rebuild the links to 2d Conv afterwards, In this case we should need to rebuild entire Resnet with 1D Conv blocks.
 I've chose to "expand" my arrays to the required 4D array required by Pytorch without changing the necessary informations.
 
-
 In Addition, I've read this paper which is a great reminder for how ResNet should work: https://arxiv.org/pdf/1611.06455.pdf
+
+For quicker processing, the batchsize is set at 50
+Using Adam Optimizer with 0.001 of LR
+Train Dev repartition is 60/40
+Using the simple Accuracy metric
+
+#### No scheduler
+
+After running without any scheduler for 500 & 5000 Epochs for only train & dev, here's the dev accuracies registered:
+
+The maximum found is around 80% Accuracy
+
+##### With Scheduler
+
+I've chosen the ConstantLR Scheduler, after some tests (500 epochs each), the best value found for it is 0.9 and effective every 5 epochs.
+After all the tests done, this helped to increase global accuracy per 10% 
