@@ -41,7 +41,7 @@ From the preview of the thesis paper, it doesn't specify if the heartbeats are e
 This information could've been useful to determine some example of the specific lead to not find suspicious data (like inverted QRS complex for ex).
 This isn't bad but could've been helpful for further "investigation" or tests.
 
-## Model
+## Basic Model
 
 ### Theory
 
@@ -89,3 +89,15 @@ After full processing (train/dev/test), test accuracy is up to 84%.
 ![Image](AccGraphRN_SchedON.png)
 
 Still need to check for false positive/negative.
+
+
+## Other Model tested
+
+Here's the other models I'll test and/or try to implement for the ECG:
+- Random Forest
+- BOSS
+- COTE
+- LSTM
+- 1D CNN with NCBAM
+
+### Random Forest
