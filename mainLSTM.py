@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 
 from functions.dataset import *
 from functions.model import *
+from functions.training import *
 # ---------- END Imports ----------
 
 params = {
@@ -27,21 +28,18 @@ params = {
     "split_seed": 42
 }
 
-model = nn.LSTM()
+mparams = {
+    'input_s':96,
+    'output_s':10,
+    'hidden_s':50,
+    'n_layer':1,
+    'batch_first':True
+}
+model = LSTModel(mparams['input_s'], mparams['hidden_s'], mparams['output_s'])
 model.to(params['device'])
-
-data_train = CustomDTS("datasets/ECG200_TRAIN.txt")
-nb = np.random.randint(len(data_train))
-mean = data_train.__getitem__(nb)[0].mean()
-std = data_train.__getitem__(nb)[0].std()
-
-transform = transforms.Compose([
-    transforms.ToTensor(), 
-    transforms.Normalize(mean, std) 
-])
-
-data_train = CustomDTS("datasets/ECG200_TRAIN.txt", transform=transform)
-data_test = CustomDTS("datasets/ECG200_TEST.txt", transform=transform)
+    
+data_train = lstmDts("datasets/ECG200_TRAIN.txt")
+data_test = lstmDts("datasets/ECG200_TEST.txt")
 data_train, data_dev = torch.utils.data.random_split(data_train, [params["train_dev_split"], 1-params["train_dev_split"]], generator=torch.Generator().manual_seed(params['split_seed']))
 
 data_ld = {
@@ -54,28 +52,27 @@ loss_fn = nn.CrossEntropyLoss()
 optimiz = optim.Adam(model.parameters(), lr=params["optim_lr"])
 metric = F1Score(task="binary").to(params["device"])
 
-
-model, best_wts, last_epoch_wts, losses, accuracies = train_dev_model(
+model, best_wts, last_epoch_wts, losses, accuracies = train_dev_modelLSTM(
     model, 
     {"train": data_ld["train"] , "dev":data_ld["dev"]},
     loss_fn, 
-    optimizer, 
+    optimiz, 
     params["device"], 
     metric, 
     epochs=params["epoch"]
 )
 
 
-losses = torch.tensor(losses).cpu()
-accuracies = torch.tensor(accuracies).cpu()
+# losses = torch.tensor(losses).cpu()
+# accuracies = torch.tensor(accuracies).cpu()
 
 
-plt.plot([i for i in range(params["epoch"])], losses, label='Loss')
-plt.show()
-plt.plot([i for i in range(params["epoch"])], accuracies, label='Accuracy')
-plt.show()
+# plt.plot([i for i in range(params["epoch"])], losses, label='Loss')
+# plt.show()
+# plt.plot([i for i in range(params["epoch"])], accuracies, label='Accuracy')
+# plt.show()
 
 
-model, accuracy_test = test(model, data_ld["test"], metric, params["device"]) 
+# model, accuracy_test = test(model, data_ld["test"], metric, params["device"]) 
 
-torch.save(model.state_dict(), "weights/RunMainLSTM.pth")
+# torch.save(model.state_dict(), "weights/RunMainLSTM.pth")
