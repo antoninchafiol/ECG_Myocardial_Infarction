@@ -20,7 +20,7 @@ from functions.training import *
 # ---------- END Imports ----------
 
 params = {
-    "epoch": 10, 
+    "epoch": 100, 
     "batch_size": 10, 
     "optim_lr": 0.001, 
     "device": torch.device("cuda:0" if torch.cuda.is_available() else "cpu"),

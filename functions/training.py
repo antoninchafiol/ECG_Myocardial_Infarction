@@ -152,11 +152,11 @@ def train_dev_modelLSTM(model, dataloaders, criterion, optimizer, device, metric
                         
                 # Compute Loss and accuracy
                 running_loss += loss.item()
-                # a = metrics(Yhat, Y)
-                # running_acc += a
+                a = metrics(output, Y)
+                running_acc += a
  
                 r_loss =loss.item()
-                # r_acc = a
+                r_acc = a
         
                 # Updater tqdm
                 progress.set_description(f"Epoch: {e+1}")
@@ -164,12 +164,12 @@ def train_dev_modelLSTM(model, dataloaders, criterion, optimizer, device, metric
         if phase == 'train' and scheduler!=None:
                     scheduler.step() 
         # Compute epoch's Loss and accuracy
-        epoch_loss = running_loss / dataloader_sizes[phase]
-        epoch_acc = running_acc / dataloader_sizes[phase]
+        epoch_loss = r_loss / dataloader_sizes[phase]
+        epoch_acc = r_acc / dataloader_sizes[phase]
         losses.append(epoch_loss)
         accuracies.append(epoch_acc)
         print(f"Epoch Loss: {epoch_loss}")
-        # print(f"Epoch Accuracy: {epoch_acc}")
+        print(f"Epoch Accuracy: {epoch_acc}")
         
         if epoch_acc > best_acc:
             best_wts_model = copy.deepcopy(model.state_dict())
