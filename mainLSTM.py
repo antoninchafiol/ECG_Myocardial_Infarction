@@ -63,8 +63,8 @@ model, best_wts, last_epoch_wts, losses, accuracies = train_dev_modelLSTM(
 )
 
 
-# losses = torch.tensor(losses).cpu()
-# accuracies = torch.tensor(accuracies).cpu()
+losses = torch.tensor(losses).cpu()
+accuracies = torch.tensor(accuracies).cpu()
 
 
 # plt.plot([i for i in range(params["epoch"])], losses, label='Loss')
@@ -73,6 +73,7 @@ model, best_wts, last_epoch_wts, losses, accuracies = train_dev_modelLSTM(
 # plt.show()
 
 
-# model, accuracy_test = test(model, data_ld["test"], metric, params["device"]) 
+model, accuracy_test = testLSTM(model, data_ld["test"], metric, params["device"]) 
+print("Test Accuracy: " + str(accuracy_test))
 
 # torch.save(model.state_dict(), "weights/RunMainLSTM.pth")

@@ -284,5 +284,30 @@ def test(model, dataloader, metrics, device, weights=None):
     print(f"Test completed in: {time_elapsed_s}")      
     return model, accuracy
 
+
+def testLSTM(model, dataloader, metrics, device, weights=None):
+    dl_size = len(dataloader)
+    start = time.time()          
+    if weights is not None:
+          model.load(weights)
+          
+    accuracy = 0.0
     
+    progress = tqdm(enumerate(dataloader), total=dl_size)
+    for i, (X,Y) in progress:
+        with torch.no_grad():
+            X = X.to(device)
+            Y = Y.to(device)
+
+            output= model(X)
+
+            accuracy += metrics(output, Y)
+
+    accuracy = accuracy / dl_size
+    
+    print(f"Accuracy: {accuracy}")
+    time_elapsed_s = np.round(time.time() - start,2) 
+    print(f"Test completed in: {time_elapsed_s}")      
+    return model, accuracy
+
     
