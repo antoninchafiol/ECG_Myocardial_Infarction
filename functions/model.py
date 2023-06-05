@@ -17,7 +17,6 @@ class LSTModel(nn.Module):
         self.fc = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
-        print(x.shape)
         _, (h_o, _) = self.lstm(x)
         out = self.fc(h_o[-1])
         return out

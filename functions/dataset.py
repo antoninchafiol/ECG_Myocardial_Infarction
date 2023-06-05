@@ -38,13 +38,9 @@ class lstmDts(Dataset):
             else:
                 Y.append(tmp)
             X.append([float(i) for i in line.split()][1:])
-
-        X = np.array(X, dtype='float32')
-        Y = np.array(Y, dtype='float32')
-        # X = X.reshape(X.shape[0],X.shape[1])
-        # print(type(X))
-        self.X = X
-        self.Y = Y
+            
+        self.X = np.array(X, dtype='float32')
+        self.Y = np.array(Y, dtype='float32')
         self.transform=transform
 
     def __len__(self):

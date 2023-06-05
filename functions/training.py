@@ -46,7 +46,6 @@ def train_dev_model(model, dataloaders, criterion, optimizer, device, metrics, s
                 X = X.to(device)
                 Y = Y.type(torch.LongTensor)
                 Y = Y.to(device)
-                print(X.shape)
                 # Put the optimizer's gradients to zero 
                 optimizer.zero_grad()
                 
@@ -133,7 +132,6 @@ def train_dev_modelLSTM(model, dataloaders, criterion, optimizer, device, metric
             for i, (X,Y) in progress:
                 # Map the images and labels of the current batch 
                 X = X.to(device)
-                # Y = Y.type(torch.LongTensor)
                 Y = Y.to(device)
                 # Put the optimizer's gradients to zero 
                 optimizer.zero_grad()
