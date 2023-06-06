@@ -29,7 +29,7 @@ def randomizeParams(t_nb):
                 "batch_size": randint(10,50), 
                 "optim_lr": (ranf() + 0.015) % 0.01, 
                 'train_dev_split': (ranf() + 0.2) % 1,
-                'lstm_input_s':96,
+                'lstm_input_s':96, # Why did I putted 96 1 line = 5 values which 4 are for X
                 'lstm_output_s':10,
                 'lstm_hidden_s':50,
                 "split_seed": 42,
@@ -73,7 +73,7 @@ params = {
     "optim_lr": 0.001, 
     'train_dev_split': 0.6,
     "split_seed": 42,
-    'lstm_input_s':96,
+    'lstm_input_s':96, # Why did I putted 96 1 line = 5 values which 4 are for X
     'lstm_output_s':10,
     'lstm_hidden_s':50,
     'batch_first':True,
