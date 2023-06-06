@@ -94,10 +94,8 @@ Still need to check for false positive/negative.
 ## Other Model tested
 
 Here's the other models I'll test and/or try to implement for the ECG:
-- Random Forest
-- BOSS
-- COTE
 - LSTM
-- 1D CNN with NCBAM
 
-### Random Forest
+There'll be more difficult model when using the ECG5000 Dataset, for this one, keeping it simple. 
+
+### LSTM
