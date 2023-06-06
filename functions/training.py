@@ -5,6 +5,7 @@ import numpy as np
 from torch.optim import *
 import torch.nn as nn
 from tqdm import tqdm
+from threading import Lock
 
 
 from torch.autograd import Variable
@@ -128,7 +129,7 @@ def train_dev_modelLSTM(model, dataloaders, criterion, optimizer, device, metric
                 model.eval()
             
             # Phase Dataloader's Loop
-            progress = tqdm(enumerate(dataloaders[phase]), desc=f"Epoch: {e}", total=dataloader_sizes[phase])
+            progress = enumerate(dataloaders[phase])
             for i, (X,Y) in progress:
                 # Map the images and labels of the current batch 
                 X = X.to(device)
@@ -141,6 +142,7 @@ def train_dev_modelLSTM(model, dataloaders, criterion, optimizer, device, metric
                     # Predict output from the current images batch
                     output = model(X)
                     # Calculate Loss from Y and the prediction
+                    print(output)
                     loss = criterion(output, Y)
                     
                     # If in training phase, 
@@ -155,8 +157,6 @@ def train_dev_modelLSTM(model, dataloaders, criterion, optimizer, device, metric
                 a = metrics(output, Y)
                 running_acc += a
         
-                # Updater tqdm
-                progress.set_description(f"Epoch: {e+1}")
                 
         if phase == 'train' and scheduler!=None:
                     scheduler.step() 
@@ -165,15 +165,15 @@ def train_dev_modelLSTM(model, dataloaders, criterion, optimizer, device, metric
         epoch_acc = running_acc / dataloader_sizes[phase]
         losses.append(epoch_loss)
         accuracies.append(epoch_acc)
-        print(f"Epoch Loss: {epoch_loss}")
-        print(f"Epoch Accuracy: {epoch_acc}")
         
         if epoch_acc > best_acc:
             best_wts_model = copy.deepcopy(model.state_dict())
     # Comopute time and displayo it
     time_elapsed_s = np.round(time.time() - start,2) 
-    print(f"Training completed in: {time_elapsed_s}")
-    
+    with Lock():
+        print(f"Loss: {losses[-1]}")
+        print(f"Accuracy: {accuracies[-1]}")
+        print(f"Training completed in: {time_elapsed_s}")
     # Copy state dict to have the alternative of the last accuracy weights
     last_epoch_wts = copy.deepcopy(model.state_dict())
     return model, best_wts, last_epoch_wts, losses, accuracies
