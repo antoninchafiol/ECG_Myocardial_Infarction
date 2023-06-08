@@ -99,3 +99,6 @@ Here's the other models I'll test and/or try to implement for the ECG:
 There'll be more difficult model when using the ECG5000 Dataset, for this one, keeping it simple. 
 
 ### LSTM
+
+To better understand and getting experience on LSTM, using Kaggle's Competition at https://github.com/antoninchafiol/Kgl_TS_StoreSales
+
