@@ -15,8 +15,7 @@ class lstmDts(Dataset):
             
         self.X = np.array(X, dtype='float32')
         self.Y = np.array(Y, dtype='float32')
-        print(self.X.shape)
-        print(self.Y.shape)
+        self.X = self.X.reshape(self.X.shape[0], self.X.shape[1], 1)
         self.transform=transform
 
     def __len__(self):

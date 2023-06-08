@@ -133,7 +133,7 @@ def train_dev_modelLSTM(model, dataloaders, criterion, optimizer, device, metric
             for i, (X,Y) in progress:
                 # Map the images and labels of the current batch 
                 X = X.to(device)
-                Y = Y.to(device)
+                Y = Y.type(torch.LongTensor).to(device)
                 # Put the optimizer's gradients to zero 
                 optimizer.zero_grad()
                 
@@ -141,10 +141,15 @@ def train_dev_modelLSTM(model, dataloaders, criterion, optimizer, device, metric
                 with torch.set_grad_enabled(phase =='train'):
                     # Predict output from the current images batch
                     output = model(X)
+                    output = torch.abs(output)
+                    output = torch.round(output)
                     # Calculate Loss from Y and the prediction
-                    print(output)
+                    print(output.min(), output.max())
+                    print(Y.min(), Y.max())
+                    
                     loss = criterion(output, Y)
                     
+                    # print(output)
                     # If in training phase, 
                     if phase =='train':
                         loss.backward()
