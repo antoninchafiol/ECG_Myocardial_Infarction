@@ -100,5 +100,5 @@ There'll be more difficult model when using the ECG5000 Dataset, for this one, k
 
 ### LSTM
 
-To better understand and getting experience on LSTM, using Kaggle's Competition at https://github.com/antoninchafiol/Kgl_TS_StoreSales
+To better understand and getting experience on LSTM, using Kaggle's Competition at [https://github.com/antoninchafiol/Kgl_TS_StoreSales](https://github.com/antoninchafiol/DisasterTweet)https://github.com/antoninchafiol/DisasterTweet
 
