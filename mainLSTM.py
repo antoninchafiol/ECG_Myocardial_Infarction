@@ -46,10 +46,7 @@ def main(params):
         
     data_train = lstmDts("datasets/ECG200_TRAIN.txt")
     data_test = lstmDts("datasets/ECG200_TEST.txt")
-    # testi = 0 
-    # x,y = data_train.__getitem__(0)
-    # print(x)
-    # print(y)
+
     data_train, data_dev = torch.utils.data.random_split(data_train, [params["train_dev_split"], 1-params["train_dev_split"]], generator=torch.Generator().manual_seed(params['split_seed']))
 
     data_ld = {
@@ -58,7 +55,7 @@ def main(params):
         "test": DataLoader(data_test, batch_size=params['batch_size'], shuffle=True)
     }
 
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = nn.BCELoss()
     optimiz = optim.Adam(model.parameters(), lr=params["optim_lr"])
     metric = F1Score(task="binary").to(params["device"])
 
@@ -91,17 +88,6 @@ params = {
 }
 
 if __name__ == '__main__':
-    # thread_nb = 5
-    # r_params = randomizeParams(thread_nb)
-    # print(r_params[0])
-    # threads = []
-    # for i in range(thread_nb):
-    #     x = Thread(target=main, args=(r_params[i],))
-    #     threads.append(x)
-    #     x.start()
-
-    # for thread in threads:
-    #     thread.join()
     main(params)
 
 
